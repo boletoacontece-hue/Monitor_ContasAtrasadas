@@ -126,9 +126,14 @@
   @media(max-width:620px){.kpis{grid-template-columns:1fr} input[type=text],select{min-width:130px}}
 
   /* ===== LOGIN ===== */
-  #btn-sair{display:none; margin-left:14px; border:1px solid rgba(255,255,255,.5); background:rgba(255,255,255,.12); color:#fff; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:700}
+  .user-box{display:none; align-items:center; gap:10px; margin-left:16px}
+  body.authed .user-box{display:inline-flex}
+  .user-id{display:inline-flex; align-items:center; gap:7px; color:#fff; font-size:12px; font-weight:600; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.28); padding:5px 11px; border-radius:20px; max-width:230px}
+  .user-id .av{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--ouro);color:#3a2f06;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:11px}
+  .user-id .em{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #btn-sair{border:1px solid rgba(255,255,255,.5); background:rgba(255,255,255,.12); color:#fff; padding:6px 13px; border-radius:8px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px}
   #btn-sair:hover{background:rgba(255,255,255,.22)}
-  body.authed #btn-sair{display:inline-flex}
+  @media(max-width:720px){ .user-id .em{max-width:120px} }
   body:not(.authed) .wrap{display:none}
   .login-overlay{position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;
     background:var(--verde); background-image:linear-gradient(135deg,var(--verde-mais),var(--verde) 55%,var(--verde2))}
@@ -189,7 +194,10 @@
       <div class="sub">Acontece Assessoria e Planejamento Imobiliário &middot; Painel de acompanhamento financeiro</div>
     </div>
     <div class="stamp" id="stamp"></div>
-    <button id="btn-sair" type="button">Sair</button>
+    <div class="user-box" id="user-box">
+      <span class="user-id" id="user-id" title=""><span class="av" id="user-av">–</span><span class="em" id="user-em">—</span></span>
+      <button id="btn-sair" type="button">⏻ Sair</button>
+    </div>
   </div>
 </header>
 
@@ -302,14 +310,21 @@
 const CFG = window.ACONTECE_CONFIG || {};
 let sb = null, booted = false;
 function loginErr(msg){ const e=document.getElementById('login-err'); e.textContent=msg; e.style.display='block'; }
+let currentUser=null;
+function setUser(u){ currentUser=u||null;
+  const em=document.getElementById('user-em'), av=document.getElementById('user-av'), box=document.getElementById('user-id');
+  if(!em) return;
+  if(u && u.email){ em.textContent=u.email; av.textContent=(u.email[0]||'?').toUpperCase(); box.title=u.email; }
+  else { em.textContent='sessão local (dev)'; av.textContent='•'; box.title='modo dev local'; }
+}
 function showApp(){ document.body.classList.add('authed'); if(!booted){ booted=true; boot(); } }
 function initAuth(){
-  if(SRC==='json'){ showApp(); return; }  // modo dev local: sem login
+  if(SRC==='json'){ setUser(null); showApp(); return; }  // modo dev local: sem login
   if(!window.supabase || !window.supabase.createClient){ loginErr('Biblioteca de login não carregou (sem internet?). Recarregue a página.'); return; }
   if(!CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY){ loginErr('Configuração ausente: preencha config.js com SUPABASE_URL e SUPABASE_ANON_KEY.'); document.getElementById('btn-entrar').disabled=true; return; }
   sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
-  sb.auth.getSession().then(({data})=>{ if(data && data.session) showApp(); }).catch(()=>{});
-  sb.auth.onAuthStateChange((_ev, session)=>{ if(session) showApp(); });
+  sb.auth.getSession().then(({data})=>{ if(data && data.session){ setUser(data.session.user); showApp(); } }).catch(()=>{});
+  sb.auth.onAuthStateChange((_ev, session)=>{ if(session){ setUser(session.user); showApp(); } });
 }
 document.getElementById('login-form').addEventListener('submit', async (e)=>{
   e.preventDefault();
@@ -322,7 +337,7 @@ document.getElementById('login-form').addEventListener('submit', async (e)=>{
   }catch(ex){ loginErr('Falha ao entrar: '+(ex.message||ex)); }
   finally{ btn.disabled=false; btn.textContent='Entrar'; }
 });
-document.getElementById('btn-sair').addEventListener('click', async ()=>{ if(sb) await sb.auth.signOut(); location.reload(); });
+document.getElementById('btn-sair').addEventListener('click', async ()=>{ if(!confirm('Deseja sair do painel?')) return; try{ if(sb) await sb.auth.signOut(); }catch(e){} location.reload(); });
 
 let DADOS=[], META={};
 const fmtBRL = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
