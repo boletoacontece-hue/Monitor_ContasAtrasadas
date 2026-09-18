@@ -21,7 +21,7 @@
   body{margin:0; font-family:'Trebuchet MS','Segoe UI',sans-serif; background:var(--creme); color:var(--tinta); font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased}
   h1,h2,h3{margin:0; font-weight:700; letter-spacing:-.01em}
   button{font-family:inherit; cursor:pointer}
-  .wrap{max-width:1400px; margin:0 auto; padding:0 18px 60px}
+  .wrap{max-width:min(1900px,98vw); margin:0 auto; padding:0 14px 60px}
 
   header{background:var(--verde); background-image:linear-gradient(135deg,var(--verde-mais),var(--verde) 55%,var(--verde2)); color:#fff; position:relative; overflow:hidden; border-bottom:3px solid var(--ouro)}
   header .wrap{padding-top:22px; padding-bottom:22px; display:flex; align-items:center; gap:16px; position:relative; z-index:2}
@@ -84,11 +84,11 @@
 
   table{width:100%; border-collapse:collapse; font-size:13px}
   .tbl-wrap{overflow:auto; max-height:82vh; border-top:1px solid var(--borda)}
-  thead th{position:sticky; top:0; background:var(--verde); color:#fff; text-align:left; padding:9px 11px; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; font-weight:700; white-space:nowrap; z-index:3; cursor:pointer; user-select:none}
+  thead th{position:sticky; top:0; background:var(--verde); color:#fff; text-align:left; padding:9px 8px; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; font-weight:700; white-space:nowrap; z-index:3; cursor:pointer; user-select:none}
   thead th.num{text-align:right}
   thead th:hover{background:var(--verde2)}
   thead th .arr{opacity:.5; font-size:10px}
-  tbody td{padding:7px 11px; border-bottom:1px solid var(--borda); vertical-align:top}
+  tbody td{padding:7px 8px; border-bottom:1px solid var(--borda); vertical-align:top}
   tbody td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
   tbody tr:hover{background:var(--creme)}
   tbody tr.grp{font-weight:700; background:var(--creme2)}
@@ -111,8 +111,8 @@
   .nowrap{white-space:nowrap}
   td.edit select,td.edit input,td.edit textarea{min-width:auto; width:100%; font-size:12px; padding:5px 6px; font-family:inherit}
   td.edit textarea{resize:vertical; min-height:38px; line-height:1.35}
-  td.edit{min-width:150px}
-  td.edit.obs{min-width:300px}
+  td.edit{min-width:120px}
+  td.edit.obs{min-width:240px}
   .sel-t0{color:var(--cinza)} .sel-t1{color:var(--azul); font-weight:600} .sel-t2{color:#7a5c00; font-weight:600}
   .sel-t3{color:var(--verde); font-weight:600} .sel-t4{color:var(--roxo); font-weight:600} .sel-t5{color:#1f6b5c; font-weight:600}
 
