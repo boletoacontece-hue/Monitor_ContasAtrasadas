@@ -1,2 +1,20 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Arquivos-fonte com dados sensíveis (NÃO versionar)
+fontes/
+*.csv
+*.xlsx
+
+# Exports gerados pelo painel
+contas_*.csv
+contas_anotacoes.json
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+
+# Em produção os dados ficam no Supabase — não publique o JSON:
+data/dados.json
+# (config.js contém só a chave anon, que é pública — pode versionar)
