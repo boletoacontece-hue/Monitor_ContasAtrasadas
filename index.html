@@ -70,7 +70,7 @@
   .trat-strip{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
   .tcard{flex:1; min-width:150px; background:var(--branco); border:1px solid var(--borda); border-left:4px solid var(--cinza2); border-radius:10px; padding:9px 12px; box-shadow:var(--sombra)}
   .tcard.t1{border-left-color:var(--azul)} .tcard.t2{border-left-color:var(--ouro)}
-  .tcard.t3{border-left-color:var(--verde2)} .tcard.t4{border-left-color:var(--roxo)} .tcard.t0{border-left-color:var(--cinza2)}
+  .tcard.t3{border-left-color:var(--verde2)} .tcard.t4{border-left-color:var(--roxo)} .tcard.t5{border-left-color:#1f6b5c} .tcard.t0{border-left-color:var(--cinza2)}
   .tcard .tl{font-size:10.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--cinza); font-weight:700}
   .tcard .tv{font-size:15px; font-weight:700; font-variant-numeric:tabular-nums; margin-top:2px}
   .tcard .tm{font-size:11px; color:var(--cinza)}
@@ -83,7 +83,7 @@
   .dim .ord{font-size:10px; background:var(--ouro); color:#3a2f06; border-radius:50%; width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center; margin-left:5px; font-weight:800}
 
   table{width:100%; border-collapse:collapse; font-size:13px}
-  .tbl-wrap{overflow:auto; max-height:600px; border-top:1px solid var(--borda)}
+  .tbl-wrap{overflow:auto; max-height:82vh; border-top:1px solid var(--borda)}
   thead th{position:sticky; top:0; background:var(--verde); color:#fff; text-align:left; padding:9px 11px; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; font-weight:700; white-space:nowrap; z-index:3; cursor:pointer; user-select:none}
   thead th.num{text-align:right}
   thead th:hover{background:var(--verde2)}
@@ -109,10 +109,12 @@
   .b-fut{background:#e3f0e3; color:var(--verde)}
   .muted{color:var(--cinza2); font-size:12px}
   .nowrap{white-space:nowrap}
-  td.edit select,td.edit input{min-width:auto; width:100%; font-size:12px; padding:5px 6px}
+  td.edit select,td.edit input,td.edit textarea{min-width:auto; width:100%; font-size:12px; padding:5px 6px; font-family:inherit}
+  td.edit textarea{resize:vertical; min-height:38px; line-height:1.35}
   td.edit{min-width:150px}
+  td.edit.obs{min-width:300px}
   .sel-t0{color:var(--cinza)} .sel-t1{color:var(--azul); font-weight:600} .sel-t2{color:#7a5c00; font-weight:600}
-  .sel-t3{color:var(--verde); font-weight:600} .sel-t4{color:var(--roxo); font-weight:600}
+  .sel-t3{color:var(--verde); font-weight:600} .sel-t4{color:var(--roxo); font-weight:600} .sel-t5{color:#1f6b5c; font-weight:600}
 
   .total-row{display:flex; justify-content:space-between; align-items:center; padding:11px 16px; background:var(--verde-mais); color:#fff; border-radius:0 0 12px 12px; font-size:13.5px; font-weight:700}
   .total-row .r{font-variant-numeric:tabular-nums}
@@ -229,6 +231,7 @@
             <option value="Todos">Todas</option>
             <option value="__sem">(sem tratativa)</option>
             <option value="Enviado para pagamento">Enviado para pagamento</option>
+            <option value="Pagamento efetuado">Pagamento efetuado</option>
             <option value="Aguardando Resposta da Administradora">Aguardando Resposta da Administradora</option>
             <option value="Liquidado ou Baixado">Liquidado ou Baixado</option>
             <option value="Locador Responsável">Locador Responsável</option>
@@ -245,7 +248,9 @@
         <div class="fg"><label>Administradora</label>
           <select id="f-adm"><option value="Todos">Todas</option></select></div>
         <div class="fg" style="flex:1; min-width:210px"><label>Buscar (imóvel, proprietário, fornecedor, responsável, obs…)</label>
-          <input type="text" id="busca" placeholder="Ex.: 3048, ANCORA, PINTURA, João…"></div>
+          <input type="text" id="busca" placeholder="Ex.: nº lançamento, 3048, ANCORA, PINTURA, João…"></div>
+        <div class="fg"><label>&nbsp;</label>
+          <label class="chkline" id="chk-exata"><input type="checkbox" id="busca-exata"> Busca exata (igual)</label></div>
       </div>
       <div class="fg" style="margin-top:13px"><label>Competência (mês de referência)</label>
         <div class="comp-pills" id="comp-pills"></div></div>
@@ -346,8 +351,8 @@ const compLabel = c => { if(c==='-'||c==='—')return '—'; const [y,m]=c.split
 const FAIXA_ORD = ['A vencer','01-30 dias','31-60 dias','61-90 dias','91-120 dias','121-180 dias','+180 dias','—','-'];
 
 // ---- anotações (tratativa / responsável / observação) ----
-const TRAT = ['Enviado para pagamento','Aguardando Resposta da Administradora','Liquidado ou Baixado','Locador Responsável'];
-const TRAT_CLS = {'':'t0','Enviado para pagamento':'t1','Aguardando Resposta da Administradora':'t2','Liquidado ou Baixado':'t3','Locador Responsável':'t4'};
+const TRAT = ['Enviado para pagamento','Pagamento efetuado','Aguardando Resposta da Administradora','Liquidado ou Baixado','Locador Responsável'];
+const TRAT_CLS = {'':'t0','Enviado para pagamento':'t1','Pagamento efetuado':'t5','Aguardando Resposta da Administradora':'t2','Liquidado ou Baixado':'t3','Locador Responsável':'t4'};
 const LS_KEY='acontece_ctapag_anotacoes_v1';
 let ann={}, storageOK=true;
 function loadAnn(){ try{ ann=JSON.parse(localStorage.getItem(LS_KEY)||'{}')||{}; }catch(e){ ann={}; storageOK=false; } }
@@ -377,7 +382,7 @@ const DIMS = {
 };
 const DIM_ORDER=['cstatus','trat','resp','cadm','faixa','forn','taxa','imovel','prop','comp','venc','origem','cquem','forma','pr','fav','cc','ocup'];
 
-const state={ conf:'Todos', trat:'Todos', origem:'Todos', faixa:'Todos', adm:'Todos', busca:'', comps:new Set(), groups:['cstatus'], expanded:new Set(), detSort:{key:'dias',dir:-1} };
+const state={ conf:'Todos', trat:'Todos', origem:'Todos', faixa:'Todos', adm:'Todos', busca:'', exata:false, comps:new Set(), groups:['cstatus'], expanded:new Set(), detSort:{key:'dias',dir:-1} };
 let allComps=[];
 
 function fillSelect(id,values,keep){ const s=document.getElementById(id); s.innerHTML='<option value="Todos">Todas</option>'; values.forEach(v=>{const o=document.createElement('option'); o.value=v; o.textContent=v; s.appendChild(o);}); s.value=(keep&&values.includes(keep))?keep:'Todos'; }
@@ -413,7 +418,9 @@ function filtrar(){
     if(state.adm!=='Todos' && r.cadm!==state.adm) return false;
     if(state.trat!=='Todos'){ const t=getAnn(r.nr).t; if(state.trat==='__sem'){ if(t) return false; } else if(t!==state.trat) return false; }
     if(state.comps.size>0 && !state.comps.has(r.comp)) return false;
-    if(q){const a=getAnn(r.nr); const hay=(r.forn+' '+r.fav+' '+r.taxa+' '+r.imovel+' '+r.prop+' '+r.nome+' '+r.compl+' '+r.cc+' '+r.cadm+' '+r.cmotivo+' '+r.cstatus+' '+a.r+' '+a.o+' '+a.t).toLowerCase(); if(!hay.includes(q))return false;}
+    if(q){ const a=getAnn(r.nr); const fs=[r.nr,r.forn,r.fav,r.taxa,r.imovel,r.prop,r.nome,r.compl,r.cc,r.cadm,r.cmotivo,r.cstatus,a.r,a.o,a.t];
+      if(state.exata){ if(!fs.some(x=>String(x==null?'':x).toLowerCase()===q)) return false; }
+      else { if(!fs.join(' ').toLowerCase().includes(q)) return false; } }
     return true;
   });
 }
@@ -474,7 +481,7 @@ const DET_COLS=[
   {lab:'Administradora',sort:'cadm',render:r=>esc(r.cadm||'')||'<span class="muted">—</span>'},
   {lab:'Tratativa',sort:'_t',cls:'edit',render:r=>tratSelect(r.nr)},
   {lab:'Responsável',sort:'_r',cls:'edit',render:r=>`<input type="text" data-nr="${r.nr}" data-f="r" value="${esc(getAnn(r.nr).r)}" placeholder="quem?">`},
-  {lab:'Observação',sort:'_o',cls:'edit',render:r=>`<input type="text" data-nr="${r.nr}" data-f="o" value="${esc(getAnn(r.nr).o)}" placeholder="obs.">`},
+  {lab:'Observação',sort:'_o',cls:'edit obs',render:r=>`<textarea data-nr="${r.nr}" data-f="o" rows="2" placeholder="observações…">${esc(getAnn(r.nr).o)}</textarea>`},
   {lab:'Valor',sort:'valor',cls:'num',render:r=>fmtBRL(r.valor)},
 ];
 function sortVal(r,k){ if(k==='valor'||k==='dias')return (r[k]==null?-1e9:+r[k]); if(k==='_t')return getAnn(r.nr).t||''; if(k==='_r')return getAnn(r.nr).r||''; if(k==='_o')return getAnn(r.nr).o||''; return (r[k]==null?'':String(r[k]).toLowerCase()); }
@@ -483,7 +490,7 @@ function renderDetalhe(rows){
   thead.innerHTML='<tr>'+DET_COLS.map(c=>{const active=state.detSort.key===c.sort; const arr=active?(state.detSort.dir>0?'▲':'▼'):'↕'; return `<th class="${c.cls==='num'?'num':''}" data-sort="${c.sort}">${c.lab} <span class="arr">${arr}</span></th>`;}).join('')+'</tr>';
   const sk=state.detSort.key,dir=state.detSort.dir;
   const sorted=[...rows].sort((a,b)=>{let x=sortVal(a,sk),y=sortVal(b,sk); if(x<y)return -dir; if(x>y)return dir; return 0;});
-  const cap=500, view=sorted.slice(0,cap);
+  const cap=5000, view=sorted.slice(0,cap);
   tbody.innerHTML = view.length? view.map(r=>'<tr>'+DET_COLS.map(c=>`<td class="${c.cls||''}">${c.render(r)}</td>`).join('')+'</tr>').join('') : '<tr><td colspan="'+DET_COLS.length+'" class="empty">Nenhum lançamento para os filtros atuais.</td></tr>';
   document.getElementById('det-tag').textContent=fmtInt(rows.length)+' lançamento(s)'+(rows.length>cap?` · exibindo os ${cap} primeiros (use filtros ou exporte para ver todos)`:'');
   thead.querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.sort; if(state.detSort.key===k)state.detSort.dir*=-1; else{state.detSort.key=k; state.detSort.dir=(k==='valor'||k==='dias')?-1:1;} renderDetalhe(filterCache);};});
@@ -656,6 +663,7 @@ document.getElementById('f-trat').onchange=e=>{state.trat=e.target.value; render
 document.getElementById('f-faixa').onchange=e=>{state.faixa=e.target.value; render();};
 document.getElementById('f-adm').onchange=e=>{state.adm=e.target.value; render();};
 let bt; document.getElementById('busca').oninput=e=>{clearTimeout(bt); bt=setTimeout(()=>{state.busca=e.target.value; render();},200);};
+document.getElementById('busca-exata').addEventListener('change',e=>{ state.exata=e.target.checked; const c=document.getElementById('chk-exata'); c.style.borderColor=e.target.checked?'var(--verde2)':'var(--borda)'; c.style.color=e.target.checked?'var(--verde)':'var(--cinza)'; render(); });
 document.getElementById('expand').onclick=()=>{state.expanded.clear(); (function walk(node,path){[...node.children.values()].forEach(ch=>{const id=path+'›'+ch.key; if(ch.children.size){state.expanded.add(id); walk(ch,id);}});})(buildTree(filterCache,state.groups),''); renderPivot(filterCache);};
 document.getElementById('collapse').onclick=()=>{state.expanded.clear(); renderPivot(filterCache);};
 document.getElementById('exp-det').onclick=exportDetalhe;
