@@ -225,7 +225,6 @@
           <select id="f-conf">
             <option value="Todos">Todas</option>
             <option value="Confirmado">Confirmado (a pagar)</option>
-            <option value="Em análise">Em análise</option>
             <option value="Sem débito">Sem débito</option>
             <option value="Em progresso">Em progresso</option>
             <option value="Sem conferência">Sem conferência</option>
@@ -235,6 +234,7 @@
             <option value="Todos">Todas</option>
             <option value="__sem">(sem tratativa)</option>
             <option value="Pagamento para a empresa">Pagamento para a empresa</option>
+            <option value="Em análise">Em análise</option>
             <option value="Enviado para pagamento">Enviado para pagamento</option>
             <option value="Pagamento efetuado">Pagamento efetuado</option>
             <option value="Aguardando Resposta da Administradora">Aguardando Resposta da Administradora</option>
@@ -356,8 +356,8 @@ const compLabel = c => { if(c==='-'||c==='—')return '—'; const [y,m]=c.split
 const FAIXA_ORD = ['A vencer','01-30 dias','31-60 dias','61-90 dias','91-120 dias','121-180 dias','+180 dias','—','-'];
 
 // ---- anotações (tratativa / responsável / observação) ----
-const TRAT = ['Pagamento para a empresa','Enviado para pagamento','Pagamento efetuado','Aguardando Resposta da Administradora','Liquidado ou Baixado','Locador Responsável'];
-const TRAT_CLS = {'':'t0','Pagamento para a empresa':'t6','Enviado para pagamento':'t1','Pagamento efetuado':'t5','Aguardando Resposta da Administradora':'t2','Liquidado ou Baixado':'t3','Locador Responsável':'t4'};
+const TRAT = ['Pagamento para a empresa','Em análise','Enviado para pagamento','Pagamento efetuado','Aguardando Resposta da Administradora','Liquidado ou Baixado','Locador Responsável'];
+const TRAT_CLS = {'':'t0','Pagamento para a empresa':'t6','Em análise':'t7','Enviado para pagamento':'t1','Pagamento efetuado':'t5','Aguardando Resposta da Administradora':'t2','Liquidado ou Baixado':'t3','Locador Responsável':'t4'};
 // Diretriz: fornecedor Acontece => pagamento à própria empresa
 function isAcontece(r){ return /acontece/i.test(r&&r.forn||''); }
 function effTrat(r){ return getAnn(r.nr).t || (isAcontece(r)?'Pagamento para a empresa':''); }
@@ -435,11 +435,10 @@ function filtrar(){
 }
 function renderKPIs(rows){
   const box=document.getElementById('kpis'); const sum=a=>a.reduce((s,r)=>s+r.valor,0); const by=s=>rows.filter(r=>r.cstatus===s);
-  const conf=by('Confirmado'), anal=by('Em análise'), semd=by('Sem débito'), prog=by('Em progresso'), semc=by('Sem conferência');
+  const conf=by('Confirmado'), semd=by('Sem débito'), prog=by('Em progresso'), semc=by('Sem conferência');
   const cards=[
     {cls:'', lab:'Total em aberto', val:fmtBRL(sum(rows)), meta:fmtInt(rows.length)+' lançamentos'},
     {cls:'alert', lab:'Confirmado (a pagar)', val:fmtBRL(sum(conf)), meta:fmtInt(conf.length)+' lançamentos'},
-    {cls:'analise', lab:'Em análise', val:fmtBRL(sum(anal)), meta:fmtInt(anal.length)+' em análise'},
     {cls:'good', lab:'Sem débito', val:fmtBRL(sum(semd)), meta:fmtInt(semd.length)+' · revisar/baixar'},
     {cls:'gold', lab:'Em progresso', val:fmtBRL(sum(prog)), meta:fmtInt(prog.length)+' em apuração'},
     {cls:'gray', lab:'Sem conferência', val:fmtBRL(sum(semc)), meta:fmtInt(semc.length)+' a conferir'},
@@ -473,7 +472,7 @@ function renderPivot(rows){
   tbody.querySelectorAll('tr.grp[data-kids="true"]').forEach(tr=>{tr.onclick=()=>{const id=tr.dataset.id; state.expanded.has(id)?state.expanded.delete(id):state.expanded.add(id); renderPivot(filterCache);};});
   document.getElementById('pivot-total').textContent=fmtBRL(tree.total)+'  ·  '+fmtInt(tree.qtd)+' lançamentos';
 }
-function confBadge(s){const m={'Confirmado':'b-conf','Em análise':'b-analise','Sem débito':'b-semdeb','Em progresso':'b-prog','Sem conferência':'b-semconf'}; return m[s]?`<span class="badge ${m[s]}">${s}</span>`:'<span class="muted">—</span>';}
+function confBadge(s){const m={'Confirmado':'b-conf','Sem débito':'b-semdeb','Em progresso':'b-prog','Sem conferência':'b-semconf'}; return m[s]?`<span class="badge ${m[s]}">${s}</span>`:'<span class="muted">—</span>';}
 function origBadge(o){const m={'Imóvel':'b-imo','Administrativo':'b-adm','Repasse':'b-rep'}; const lab={'Imóvel':'Imóvel','Administrativo':'Adm','Repasse':'Repasse'}; return `<span class="badge ${m[o]||'b-semconf'}">${lab[o]||o}</span>`;}
 function tratSelect(r){
   const cur=effTrat(r); let o='<option value=""></option>';
